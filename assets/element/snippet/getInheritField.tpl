@@ -7,6 +7,7 @@
  * @category 	snippet
  * @version 	1.3
  * @license 	http://www.gnu.org/copyleft/gpl.html GNU Public License (GPL)
+ * @author 	Sergey Davydov <webmaster@sdcollection.com>
  * @internal	@properties
  * @internal	@modx_category Utils
  * @internal	@installset base, sample
