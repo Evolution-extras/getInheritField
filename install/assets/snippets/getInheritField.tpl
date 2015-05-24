@@ -23,6 +23,7 @@ $deep = isset($deep)?$deep:100;
 $out = isset($out)?$out:"%s";
 $outEmpty = isset($outEmpty)?$outEmpty:"%s";
 $rootID = isset($rootID)?$rootID:0; // ID коневого (верхнего) раздела, для которого значение уже не найдено
+$runSnippet = isset($runSnippet)?$runSnippet:false; // выполнить сниппет, формат строки как при обычном вызове,но без ограничивающих скобок, для подстановки найденного значения использовать %s 
 
 $value = $toparent;
 $cid = $id;
@@ -30,6 +31,8 @@ while ( $value == $toparent and (int)$cid!=$rootID and --$deep > 0) {
  $value = $modx->getTemplateVarOutput(array($field,"parent"), $cid, 1);
  $cid = $value["parent"];
  $value = $value[$field];
+ if ($runSnippet) $value = $modx->evalSnippets("[[".sprintf($runSnippet,$value)."]]");
+
 }
 if ($value == $toparent) $value = $default;
 return $value?
