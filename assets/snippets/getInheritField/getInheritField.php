@@ -5,6 +5,7 @@
  *  &id          = [*id*]   // ID ресурса, с которого начинать поиск вверх по родителям
  *  &field       =          // Поле, которое необходимо определять
  *  &default     =          // Значение по умолчания, если не нашли значение поля до самого верха
+ *  &defaultID   =          // Значение по умолчания из указанного ресурса, если не нашли значение поля до самого верха
  *  &toparent    =          // Флаг перехода к получению значения родителя
  *  &deep        = 100      // Максимальная вложенность поиска
  *  &out         = %s       // Формат выходного результата (sprintf, %s буде заменен на найденное значение)
@@ -27,27 +28,34 @@
  *   [[getInheritField? &id=`[*parent*]` &field=`addtexts` &runSnippet=`ddGetMultipleField? &string='%s'  &filter='1::beforeText||2::1' &columns='0'`]]
  */
 
-$id     = isset($id)?$id:$modx->documentObject['id'];
-$field  = isset($field)?$field:"";
-$default = isset($default)?$default:"";
-$toparent = isset($toparent)?$toparent:"";
-$deep = isset($deep)?$deep:100;
-$out = isset($out)?$out:"%s";
-$outEmpty = isset($outEmpty)?$outEmpty:"%s";
-$rootID = isset($rootID)?$rootID:0;
-$runSnippet = isset($runSnippet)?$runSnippet:false;
+$id         = isset($id) ? $id : $modx->documentObject['id'];
+$field      = isset($field) ? $field : "";
+$default    = isset($default) ? $default : "";
+$defaultID  = isset($defaultID) ? (int)$defaultID : false;
+$toparent   = isset($toparent) ? $toparent : "";
+$deep       = isset($deep) ? (int)$deep : 100;
+$out        = isset($out) ? $out : "%s";
+$outEmpty   = isset($outEmpty) ? $outEmpty : "%s";
+$rootID     = isset($rootID) ? (int)$rootID : 0;
+$runSnippet = isset($runSnippet) ? $runSnippet : false;
 
 $value = $toparent;
 $cid = $id;
-while ( $value == $toparent and (int)$cid!=$rootID and --$deep > 0) {
- $value = $modx->getTemplateVarOutput(array($field,"parent"), $cid, 1);
- $cid = $value["parent"];
- $value = $value[$field];
- if ($runSnippet) $value = $modx->evalSnippets("[[".sprintf($runSnippet,$value)."]]");
+while ($value == $toparent and (int)$cid != $rootID and --$deep > 0) {
+	$value = $modx->getTemplateVarOutput(array($field, "parent"), $cid, 1);
+	$cid = $value["parent"];
+	$value = $value[$field];
 
 }
-if ($value == $toparent) $value = $default;
-return $value?
- ($out?sprintf($out,$value):""):
- ($outEmpty?sprintf($outEmpty,$value):"");
+if ($value == $toparent) {
+	if ($defaultID and !$default) {
+		$default = $modx->getTemplateVarOutput(array($field), $defaultID, 1);
+		$default = $default[$field];
+	}
+	$value = $default;
+}
+if ($value && $runSnippet) $value = $modx->evalSnippets("[[" . sprintf(trim($runSnippet), $value) . "]]");
+return $value ?
+	($out ? sprintf($out, $value) : "") :
+	($outEmpty ? sprintf($outEmpty, $value) : "");
 ?>

@@ -5,7 +5,7 @@
  * Получить значение наследуемого параметра
  *
  * @category 	snippet
- * @version 	1.4
+ * @version 	1.5
  * @license 	http://www.gnu.org/copyleft/gpl.html GNU Public License (GPL)
  * @author 	Sergey Davydov <webmaster@sdcollection.com>
  * @internal	@properties
